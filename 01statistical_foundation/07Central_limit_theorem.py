@@ -55,9 +55,44 @@ def visualize_central_limit_theorem(data, sample_size, num_samples):
     plt.title(f"sample size: {sample_size} & Number of samples: {sample_size}")
     plt.xlabel("Sample Mean")
     plt.ylabel("Frequency")
-    plt.show()
+    # plt.show()
 
 
 # visualize_central_limit_theorem(data["amt"], sample_size=30, num_samples=1000)
 # visualize_central_limit_theorem(data["amt"], sample_size=100, num_samples=1000)
-visualize_central_limit_theorem(data["amt"], sample_size=500, num_samples=1000)
+# visualize_central_limit_theorem(data["amt"], sample_size=500, num_samples=1000)
+
+
+"""
+TODO: Difference between `sample mean` vs `sampling distribution mean`
+- sample mean:  The mean of the single sample
+- sample distribution mean: The mean of all the possible sample mean which approximates to the population mean 
+"""
+sample_means_distribution = [
+    np.mean(np.random.choice(data["amt"], size=100)) for _ in range(1000)
+]
+
+sampling_distribution_mean = np.mean(sample_means_distribution)
+# print(sampling_distribution_mean)  # 123.53625410000001 <approx population mean>
+
+"""
+NOTE: Mean of sample means distribution ≈ Population Mean
+Bcz, as per CLT sample means distribution creates the NORMAL DISTRIBUTION
+"""
+
+# Population SD
+population_std = data["amt"].std()
+
+sample_sizes = [10, 50, 100, 500, 1000]
+
+# find standard errors correspoding to the different sample size that we are taking
+standard_errors = [
+    population_std / np.sqrt(sample_size) for sample_size in sample_sizes
+]
+
+plt.figure(figsize=(10,6))
+plt.plot(sample_sizes, standard_errors, marker = "o", linestyle="--" )
+plt.title("Standard Errors Vs Sample Size")
+plt.xlabel("Sample Size")
+plt.ylabel("Standard Error")
+plt.show()
