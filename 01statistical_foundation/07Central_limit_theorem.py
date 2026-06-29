@@ -28,8 +28,8 @@ sample_means = [
     data["amt"].sample(n=size, random_state=42).mean() for size in sample_sizes
 ]
 
-for size, mean in zip(sample_sizes, sample_means):
-    print(f"sample size: {size}, sample mean: {mean} ")
+# for size, mean in zip(sample_sizes, sample_means):
+#     print(f"sample size: {size}, sample mean: {mean} ")
 
 """
 sample size: 10, sample mean: 96.85499999999999 
@@ -45,3 +45,19 @@ sample size: 7000, sample mean: 126.52721
 # NOTE:
 # As the sample size increases -- sample mean becomes the better estimater of the population mean
 # This is one of the key ideas of the Central Limit Theorem (CLT)
+
+
+def visualize_central_limit_theorem(data, sample_size, num_samples):
+    sample_means = [
+        np.mean(np.random.choice(data, size=sample_size)) for _ in range(num_samples)
+    ]
+    sns.histplot(sample_means, bins=30, kde=True)
+    plt.title(f"sample size: {sample_size} & Number of samples: {sample_size}")
+    plt.xlabel("Sample Mean")
+    plt.ylabel("Frequency")
+    plt.show()
+
+
+# visualize_central_limit_theorem(data["amt"], sample_size=30, num_samples=1000)
+# visualize_central_limit_theorem(data["amt"], sample_size=100, num_samples=1000)
+visualize_central_limit_theorem(data["amt"], sample_size=500, num_samples=1000)
