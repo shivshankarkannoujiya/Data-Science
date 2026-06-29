@@ -39,3 +39,10 @@ plt.ylabel("Frequency")
 plt.savefig("portfolio_returns_platy.png")
 
 plt.show()
+
+"""
+OBSERVATION:
+As we increase the sample size => Standard Error will decrease
+=> SE = sigma(SD)/sqrt(n)<sample size>
+SE and sample are inversely proportional
+"""
