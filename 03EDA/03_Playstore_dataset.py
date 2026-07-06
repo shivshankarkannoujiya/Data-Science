@@ -17,6 +17,8 @@ Steps We Are Going to Follow
 from pathlib import Path
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 BASE_DIR = Path(__file__).parent
 data_path = BASE_DIR / "googleplaystore.csv"
@@ -181,4 +183,143 @@ df_copy["Year"] = df_copy["Last Updated"].dt.year
 df_copy.drop(columns="Last Updated", inplace=True)
 # print(df_copy.info())
 
-df_copy.to_csv("data/google_cleaned.csv")
+# df_copy.to_csv("data/google_cleaned.csv")
+
+
+# NOTE: Perform EDA
+# print(df_copy.head())
+
+# TODO: 1. Check is there any duplicate value present
+# print(df_copy.duplicated("App").value_counts())
+"""
+False    9660
+True     1181
+"""
+
+# print(df_copy[df_copy.duplicated("App")].shape)  # (1181, 15)
+
+"""
+OBSERVATION:
+- dataset has duplicate records
+- TODO: Drop all the duplicate records
+"""
+
+df_copy = df_copy.drop_duplicates(subset=["App"], keep="first")
+# print(df_copy.shape)
+
+
+# NOTE: Explore data
+# Check Numerical and Categorical Cols
+
+numeric_features = df_copy.select_dtypes(include=["number"]).columns.tolist()
+categorical_features = df_copy.select_dtypes(
+    include=["object", "category"]
+).columns.tolist()
+
+# print(f"We have {len(numeric_features)} numerical features: {numeric_features}")
+# print(
+#     f"We have {len(categorical_features)} categorical features: {categorical_features}"
+# )
+
+
+# NOTE: Proporation of count data on categorical cols
+# for col in categorical_features:
+#     print(df_copy[col].value_counts(normalize=True) * 100)
+#     print("---------------------------------------------")
+
+
+# plt.figure(figsize=(15, 15))
+# plt.suptitle(
+#     "Univariate Analysis of Numerical Feature",
+#     fontsize=20,
+#     fontweight="bold",
+#     alpha=0.8,
+#     y=1.0,
+# )
+
+# for i in range(0, len(numeric_features)):
+#     plt.subplot(5, 3, i + 1)
+#     sns.kdeplot(x=df_copy[numeric_features[i]], fill=True, color="r")
+#     plt.xlabel(numeric_features[i])
+#     plt.tight_layout()
+
+# plt.show()
+
+"""
+OBSERVATION:
+
+- Rating and Year is Left-skewed
+- While Reviews, Size, Installs and Price are Right-skewed
+- Outliers are definately present
+"""
+
+# plt.figure(figsize=(15, 15))
+# plt.suptitle(
+#     "Univariate Analysis of Categorical Feature",
+#     fontsize=20,
+#     fontweight="bold",
+#     alpha=0.8,
+#     y=1.0,
+# )
+# category = ["Type", "Content Rating"]
+
+# for i in range(0, len(category)):
+#     plt.subplot(5, 3, i + 1)
+#     sns.countplot(x=df_copy[category[i]], palette="Set2")
+#     plt.xlabel(category[i])
+#     plt.xticks(rotation=True)
+#     plt.tight_layout()
+
+# plt.show()
+
+
+"""
+- Which is the most popular app category
+"""
+# df_copy["Category"].value_counts().plot.pie(
+#     y=df_copy["Category"], figsize=(15, 16), autopct="%1.1f"
+# )
+# plt.show()
+
+"""
+OBSERVATION:
+
+- There are more kinds of apps in playstore which are under category of family, games & tools 
+- Beauty, comics, arts and weather kinds of apps are very less in playstore.
+"""
+
+# Top 10 App categories
+category = df_copy["Category"].value_counts().reset_index()
+
+plt.figure(figsize=(15, 6))
+sns.barplot(x="Category", y="count", data=category[:10], palette="hls")
+plt.title("Top 10 App Category")
+plt.xticks(rotation=90)
+# plt.show()
+
+"""
+Insights
+- Family category has the most number of apps with 10% of apps belonging to it. followed by Game catogory which have 11% of apps.
+- Least number of apps belongs to beauty category with less than 1% of the total apps belonging to it.
+"""
+
+"""
+ASSIGNMENT:
+- Which category has largest number of installation?
+- What are the top 5 most installed Apps in each popular categories?
+- How many Apps are there on Google Play Store which get 5 rating?
+
+"""
+
+category_installs = (
+    df.groupby("Category")["Installs"].sum().sort_values(ascending=False)
+)
+
+# print(category_installs)
+
+top5_apps = df.sort_values("Installs", ascending=False).groupby("Category").head(5)
+# print(top5_apps[["Category", "App", "Installs"]])
+
+
+rating_5 = df[df["Rating"] == 5]
+print("Number of Apps :", len(rating_5))
